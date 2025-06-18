@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Nightreign Companion</title>
+        <style>
+            body {
+                font-family: "Segoe UI", sans-serif;
+                background: #0e0f1a;
+                color: #fff;
+                margin: 0;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            .banner {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                z-index: -1;
+                pointer-events: none;
+                background: url("ncbackground.png") center center / auto 100%
+                    no-repeat;
+            }
+
+            .page-content {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                gap: 2em;
+                padding: 0 2em;
+                position: relative;
+                z-index: 1;
+            }
+
+            .container {
+                background: #1c1e2b;
+                padding: 2em;
+                border-radius: 20px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+                text-align: center;
+                max-width: 400px;
+                width: 90%;
+                z-index: 2;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 330px;
+            }
+
+            .boss-button {
+                width: 95px; /* Set your desired button width */
+                height: 95px; /* Set your desired button height */
+                padding: 0; /* Remove default padding */
+                border: none; /* Optional: remove border */
+                background: none; /* Optional: remove background */
+                cursor: pointer;
+            }
+
+            .boss-button img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* or "contain" if you want to keep aspect ratio */
+            }
+
+            h1 {
+                color: #fdfdfd;
+                margin-bottom: 0.5em;
+                font-size: 1.8em;
+            }
+
+            #title {
+                font-size: 1.2em;
+                color: #bbb;
+                margin-bottom: 0.5em;
+            }
+
+            #timer {
+                font-size: 3em;
+                font-weight: bold;
+                color: #00ffcc;
+                margin: 0.5em 0;
+            }
+
+            .buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5em;
+                justify-content: center;
+                margin-top: 1em;
+            }
+
+            button {
+                padding: 0.6em 1.2em;
+                font-size: 1em;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: background 0.3s;
+                min-width: 80px;
+                background-color: #333;
+                color: white;
+            }
+
+            button:hover {
+                background-color: #555;
+            }
+
+            .start-btn {
+                background-color: #27ae60;
+                color: white;
+            }
+            .start-btn:hover {
+                background-color: #219150;
+            }
+
+            .stop-btn {
+                background-color: #f39c12;
+                color: white;
+            }
+            .stop-btn:hover {
+                background-color: #d68910;
+            }
+
+            .reset-btn {
+                background-color: #e74c3c;
+                color: white;
+            }
+            .reset-btn:hover {
+                background-color: #c0392b;
+            }
+
+            .skip-btn {
+                background-color: #2980b9;
+                color: white;
+            }
+            .skip-btn:hover {
+                background-color: #1f6391;
+            }
+
+            #progressBar {
+                height: 20px;
+                width: 100%;
+                background-color: #444;
+                border-radius: 10px;
+                margin-top: 1em;
+                overflow: hidden;
+            }
+
+            #progressFill {
+                height: 100%;
+                width: 0%;
+                border-radius: 10px;
+                transition: width 1s linear, background-color 0.5s;
+            }
+
+            #bossName {
+                text-align: center;
+                margin-bottom: 1em;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="banner"></div>
+        <div
+            id="topControls"
+            style="
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 10;
+                background: rgba(30, 30, 30, 0.9);
+                padding: 10px;
+                border-radius: 8px;
+            "
+        >
+            <label style="color: white; display: block; margin-bottom: 5px">
+                <input type="checkbox" onchange="toggleContainer('btBox')" />
+                Hide Nightlord Stats
+            </label>
+            <label style="color: white; display: block; margin-bottom: 5px">
+                <input
+                    type="checkbox"
+                    onchange="toggleContainer('circleTimerBox')"
+                />
+                Hide Nightreign Circle Timer
+            </label>
+            <!-- <label style="color: white; display: block; margin-bottom: 5px;">
+	  <input type="checkbox" id="toggleMemeNames"/>
+	  Toggle Meme Names
+	</label>-->
+        </div>
+        <div class="page-content">
+            <div id="btBox" class="container">
+                <div id="btStateSelect">
+                    <h1>Nightlord Stats</h1>
+                    <div
+                        style="
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 0.5em;
+                        "
+                    >
+                        <button class="boss-button" onclick="selectBoss('Dog')">
+                            <img src="Boss Icons/Dog.webp" alt="Dog Icon" />
+                        </button>
+                        <button class="boss-button" onclick="selectBoss('Jaw')">
+                            <img src="Boss Icons/Jaw.webp" alt="Jaw Icon" />
+                        </button>
+                        <button
+                            class="boss-button"
+                            onclick="selectBoss('Moth')"
+                        >
+                            <img src="Boss Icons/Moth.webp" alt="Moth Icon" />
+                        </button>
+                        <button
+                            class="boss-button"
+                            onclick="selectBoss('Augur')"
+                        >
+                            <img src="Boss Icons/Augur.webp" alt="Augur Icon" />
+                        </button>
+                        <button
+                            class="boss-button"
+                            onclick="selectBoss('Goat')"
+                        >
+                            <img src="Boss Icons/Goat.webp" alt="Goat Icon" />
+                        </button>
+                        <button
+                            class="boss-button"
+                            onclick="selectBoss('Centaur')"
+                        >
+                            <img
+                                src="Boss Icons/Centaur.webp"
+                                alt="Centaur Icon"
+                            />
+                        </button>
+                        <button
+                            class="boss-button"
+                            onclick="selectBoss('Dragon')"
+                        >
+                            <img
+                                src="Boss Icons/Drake.webp"
+                                alt="Dragon Icon"
+                            />
+                        </button>
+                        <button
+                            class="boss-button"
+                            onclick="selectBoss('Nightlord')"
+                        >
+                            <img
+                                src="Boss Icons/Nightlord.webp"
+                                alt="Nightlord Icon"
+                            />
+                        </button>
+                    </div>
+                </div>
+                <div id="btStateInfo" style="display: none">
+                    <h1 id="bossName"></h1>
+                    <div id="bossInfo" style="text-align: left"></div>
+                </div>
+            </div>
+
+            <div class="container" id="circleTimerBox">
+                <h1>Nightreign Circle Timer</h1>
+                <div id="title">Ready</div>
+                <div id="timer">00:00</div>
+                <div id="progressBar"><div id="progressFill"></div></div>
+                <div class="buttons">
+                    <button class="start-btn" onclick="startTimers()">
+                        Start
+                    </button>
+                    <button class="stop-btn" onclick="stopTimers()">
+                        Stop
+                    </button>
+                    <button class="skip-btn" onclick="skipTimer()">Skip</button>
+                    <button class="reset-btn" onclick="resetTimers()">
+                        Reset
+                    </button>
+                </div>
+                <audio
+                    id="alertSound"
+                    src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
+                    preload="auto"
+                ></audio>
+            </div>
+        </div>
+        <script>
+            	function toggleContainer(id) {
+            	  const el = document.getElementById(id);
+            	  if (!el) return;
+            	  el.style.display = (el.style.display === "none") ? "flex" : "none";
+            	}
+
+            	const timerDurations = [270, 180, 210, 180]; // seconds
+                const timerTitles = [
+                  "1st Circle Start",
+                  "1st Circle Closing",
+                  "2nd Circle Start",
+                  "2nd Circle Closing"
+                ];
+
+                const timerBaseColors = ["#1abc9c", "#3498db", "#9b59b6", "#e67e22"];
+
+                let currentTimer = 0;
+                let countdownInterval = null;
+                let duration = 0;
+                let timeLeft = 0;
+                let soundPlayed = false;
+
+                function updateDisplay() {
+                  const titleEl = document.getElementById('title');
+                  const timerEl = document.getElementById('timer');
+                  const progress = document.getElementById('progressFill');
+
+                  if (currentTimer < timerTitles.length) {
+                    titleEl.textContent = timerTitles[currentTimer];
+                  }
+
+                  const minutes = Math.floor(timeLeft / 60);
+                  const seconds = timeLeft % 60;
+                  timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                  const percent = ((duration - timeLeft) / duration) * 100;
+                  progress.style.width = `${percent}%`;
+
+                  if (percent >= 75) {
+                    progress.style.backgroundColor = '#e74c3c'; // red
+                  } else if (percent >= 50) {
+                    progress.style.backgroundColor = '#f1c40f'; // yellow
+                  } else {
+                    progress.style.backgroundColor = timerBaseColors[currentTimer] || '#27ae60';
+                  }
+                }
+
+                function tick() {
+                  if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    currentTimer++;
+                    startNextTimer();
+                    return;
+                  }
+
+                  if (timeLeft === 30 && !soundPlayed) {
+                    document.getElementById('alertSound').play();
+                    soundPlayed = true;
+                  }
+
+                  timeLeft--;
+                  updateDisplay();
+                }
+
+                function startNextTimer() {
+                  if (currentTimer >= timerDurations.length) {
+                    resetToIdle();
+                    return;
+                  }
+
+                  duration = timerDurations[currentTimer];
+                  timeLeft = duration;
+                  soundPlayed = false;
+                  updateDisplay();
+                  countdownInterval = setInterval(tick, 1000);
+                }
+
+                function startTimers() {
+                  if (countdownInterval !== null) return;
+
+                  if (currentTimer >= timerDurations.length) {
+                    currentTimer = 0;
+                  }
+
+                  if (timeLeft > 0) {
+                    countdownInterval = setInterval(tick, 1000);
+                  } else {
+                    startNextTimer();
+                  }
+                }
+
+                function stopTimers() {
+                  clearInterval(countdownInterval);
+                  countdownInterval = null;
+                }
+
+                function resetTimers() {
+                  stopTimers();
+                  currentTimer = 0;
+                  duration = 0;
+                  timeLeft = 0;
+                  soundPlayed = false;
+                  document.getElementById('title').textContent = 'Ready';
+                  document.getElementById('timer').textContent = '00:00';
+                  document.getElementById('progressFill').style.width = "0%";
+                  document.getElementById('progressFill').style.backgroundColor = '#27ae60';
+                }
+
+                function skipTimer() {
+                  stopTimers();
+                  currentTimer++;
+                  if (currentTimer >= timerDurations.length) {
+                    resetToIdle();
+                  } else {
+                    startNextTimer();
+                  }
+                }
+
+                function resetToIdle() {
+                  stopTimers();
+                  currentTimer = 0;
+                  duration = 0;
+                  timeLeft = 0;
+                  soundPlayed = false;
+                  document.getElementById('title').textContent = 'Ready';
+                  document.getElementById('timer').textContent = '00:00';
+                  document.getElementById('progressFill').style.width = "0%";
+                  document.getElementById('progressFill').style.backgroundColor = '#27ae60';}
+
+            	// === Boss Information ===
+
+                const bossData = {
+                  "Dog": { weakness: "Holy", stats: { Fire: -50, Holy: 35, Rot: 252, Bleed: 252, Sleep: 154 } },
+                  "Jaw": { weakness: "Poison", stats: { Fire: -20, Lightning: -50, Poison: 154, Rot: 154, Bleed: 541, Frostbite: 154, Sleep: 154 } },
+                  "Moth": { weakness: "Fire", stats: { Magic: -50, Fire: 40, Lightning: -10, Holy: -10, Poison: 541, Rot: 154, Bleed: 154, Frostbite: 154, Sleep: 252 } },
+                  "Augur": { weakness: "Lightning", stats: { Magic: -20, Fire: -50, Lightning: 40, Holy: -15, Rot: 252, Frostbite: 252 } },
+                  "Goat": { weakness: "Madness", stats: { Magic: -20, Fire: 20, Holy: 35, Poison: 154, Rot: 154, Bleed: 252, Frostbite: 252, Madness: 154 } },
+                  "Centaur": { weakness: "Lightning", stats: { Lightning: 20, Holy: -30, Poison: 154, Rot: 154, Bleed: 154, Frostbite: 154, Sleep: 154} },
+                  "Dragon": { weakness: "Fire", stats: { Magic: -20, Fire: 35, Lightning: -20, Holy: -20, Poison: 252, Rot: 252, Bleed: 252, Frostbite: 541, Sleep: 541 } },
+                  "Nightlord": { weakness: "Holy", stats: { Lightning: 20, Holy: 20, Rot: 252, Sleep: 541 } }
+                };
+                const cat1 = ["Magic", "Fire", "Lightning", "Holy"];
+                const cat2 = ["Poison", "Rot", "Bleed", "Frostbite", "Sleep", "Madness"];
+
+                function selectBoss(name) {
+                  const data = bossData[name];
+                  const infoEl = document.getElementById("bossInfo");
+                  const nameEl = document.getElementById("bossName");
+                  nameEl.textContent = name;
+                  nameEl.onclick = () => {
+                    document.getElementById("btStateSelect").style.display = "block";
+                    document.getElementById("btStateInfo").style.display = "none";
+                  };
+                  infoEl.innerHTML = "";
+            	  nameEl.title = "Click to go back to the boss list";
+
+            	// === CATEGORY 1 ===
+            	const cat1Container = document.createElement("div");
+            	cat1Container.style.display = "grid";
+            	cat1Container.style.gridTemplateColumns = "repeat(4, 1fr)";
+            	cat1Container.style.gap = "15px";
+            	cat1Container.style.padding = "0 20px"; // add consistent horizontal spacing
+            	cat1Container.style.justifyItems = "center";
+
+            cat1.forEach(type => {
+              const val = data.stats[type];
+              const container = document.createElement("div");
+              container.style.display = "flex";
+              container.style.alignItems = "center";
+
+              const iconWrapper = document.createElement("div");
+              iconWrapper.style.position = "relative";
+              iconWrapper.style.display = "inline-block";
+
+              const img = document.createElement("img");
+              img.src = `Element Icons/${type}.png`;
+              img.alt = type;
+              img.width = 57; img.height = 57;
+              img.style.borderRadius = "8px";
+              img.style.border = "3px solid";
+
+            	if (val === undefined) {
+            	  img.style.borderColor = "#555";
+            	} else if (val > 0) {
+            	  img.style.borderColor = "limegreen";
+            	  if (data.weakness === type) {
+            		img.style.boxShadow = "0 0 10px 3px orange";
+            	  }
+            	} else {
+            	  img.style.borderColor = "red";
+            	}
+
+              const valSpan = document.createElement("span");
+              valSpan.textContent = (val !== undefined)
+                ? ((val > 0 ? "+" : "") + val + "%")
+                : "0%";
+              valSpan.style.position = "absolute";
+              valSpan.style.top = "50%";
+              valSpan.style.left = "50%";
+              valSpan.style.transform = "translate(-50%, -50%)";
+              valSpan.style.fontWeight = "bold";
+              valSpan.style.fontSize = "20px";
+              valSpan.style.webkitTextStroke = "1px black";
+              valSpan.style.color = (val === undefined)
+                ? "lightgray"
+                : (val > 0 ? "limegreen" : "red");
+
+              iconWrapper.appendChild(img);
+              iconWrapper.appendChild(valSpan);
+              container.appendChild(iconWrapper);
+              cat1Container.appendChild(container);
+            });
+            infoEl.appendChild(cat1Container);
+
+            // === SPACER ===
+            	const spacer = document.createElement("div");
+            	spacer.style.height = "15px";
+            	infoEl.appendChild(spacer);
+
+            // === CATEGORY 2 ===
+            	const cat2Container = document.createElement("div");
+            	cat2Container.style.display = "grid";
+            	cat2Container.style.gridTemplateColumns = "repeat(4, 1fr)";
+            	cat2Container.style.gap = "15px";
+            	cat2Container.style.padding = "0 20px";
+            	cat2Container.style.justifyItems = "center";
+
+            // Create array of icon elements
+            const icons = cat2.map(type => {
+              const val = data.stats[type];
+              const img = document.createElement("img");
+              img.src = `Element Icons/${type}.png`;
+              img.alt = type;
+              img.width = 57; img.height = 57;
+              img.style.borderRadius = "8px";
+              img.style.border = "3px solid";
+
+            if (data.weakness === type) {
+                img.style.boxShadow = "0 0 12px 6px rgba(255,165,0,0.7)";
+                img.style.borderColor = "limegreen";
+            }
+             else if (val === 154) img.style.borderColor = "limegreen";
+              else if (val === 252) img.style.borderColor = "yellow";
+              else if (val === 541) img.style.borderColor = "red";
+              else img.style.borderColor = "black";
+
+              const wrapper = document.createElement("div");
+              wrapper.style.width = "57px";
+              wrapper.style.height = "57px";
+              wrapper.style.display = "flex";
+              wrapper.style.justifyContent = "center";
+              wrapper.style.alignItems = "center";
+              wrapper.appendChild(img);
+              return wrapper;
+            });
+
+            // Helper for empty cells
+            function emptySlot() {
+              const e = document.createElement("div");
+              e.style.width = "57px";
+              e.style.height = "57px";
+              return e;
+            }
+
+            // Define custom positions (8 slots total)
+            const gridSlots = [
+              icons[0] ?? emptySlot(), icons[1] ?? emptySlot(),
+              icons[2] ?? emptySlot(), icons[3] ?? emptySlot(),
+              emptySlot(), icons[4] ?? emptySlot(),
+              icons[5] ?? emptySlot(), emptySlot()
+            ];
+
+            // Add to grid, applying marginTop to row 2
+            gridSlots.forEach((el, i) => {
+              if (i >= 4) {
+                el.style.marginTop = "15px"; // Equal spacing between rows
+              }
+              else {
+            	el.style.marginTop = "10px";
+              }
+              cat2Container.appendChild(el);
+            });
+
+            infoEl.appendChild(cat2Container);
+
+            const memeNameMap = {
+                "Gladius": "Dog",
+                "Adel": "Jaw",
+                "Gnoster": "Moth",
+                "Maris": "Augur",
+                "Libra": "Goat",
+                "Fulghor": "Centaur",
+                "Caligo": "Dragon",
+                "Heolstor": "Nightlord"
+            };
+
+
+            // Helper for empty cells
+            function emptySlot() {
+              const e = document.createElement("div");
+              e.style.width = "57px";
+              e.style.height = "57px";
+              return e;
+            }
+                  document.getElementById("btStateSelect").style.display = "none";
+                  document.getElementById("btStateInfo").style.display = "block";
+            }
+        </script>
+    </body>
+</html>
